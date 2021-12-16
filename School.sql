@@ -31,8 +31,7 @@ CREATE TABLE StudentGroups (
 CREATE TABLE StudentGroupMembers (
 	Id int IDENTITY(1, 1) PRIMARY KEY,
 	StudentGroupId int FOREIGN KEY REFERENCES StudentGroups(Id) NOT NULL,
-	StudentId int FOREIGN KEY REFERENCES Students(Id) NOT NULL,
-	Paid bit NOT NULL
+	StudentId int FOREIGN KEY REFERENCES Students(Id) NOT NULL
 )
 
 CREATE TABLE StudentGroupLectures (
@@ -43,7 +42,7 @@ CREATE TABLE StudentGroupLectures (
 	EndDate datetime2 NOT NULL
 )
 
-CREATE TABLE StudentGroupLectureStudents (
+CREATE TABLE StudentGroupLectureAttendance (
 	Id int IDENTITY(1, 1) PRIMARY KEY,
 	StudentGroupLectureId int FOREIGN KEY REFERENCES StudentGroupLectures(Id) NOT NULL,
 	StudentId int FOREIGN KEY REFERENCES Students(Id) NOT NULL,
