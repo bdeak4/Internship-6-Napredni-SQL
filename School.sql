@@ -14,7 +14,8 @@ CREATE TABLE Students (
 	Id int IDENTITY(1, 1) PRIMARY KEY,
 	FirstName nvarchar(50) NOT NULL,
 	LastName nvarchar(50) NOT NULL,
-	Age int NOT NULL
+	PriorKnowledge nvarchar(2) NOT NULL,
+	Birthday datetime2 NOT NULL
 )
 
 CREATE TABLE Courses (
@@ -30,7 +31,24 @@ CREATE TABLE StudentGroups (
 CREATE TABLE StudentGroupMembers (
 	Id int IDENTITY(1, 1) PRIMARY KEY,
 	StudentGroupId int FOREIGN KEY REFERENCES StudentGroups(Id) NOT NULL,
-	StudentId int FOREIGN KEY REFERENCES Students(Id) NOT NULL
+	StudentId int FOREIGN KEY REFERENCES Students(Id) NOT NULL,
+	Paid bit NOT NULL
+)
+
+CREATE TABLE StudentGroupLectures (
+	Id int IDENTITY(1, 1) PRIMARY KEY,
+	StudentGroupId int FOREIGN KEY REFERENCES StudentGroups(Id) NOT NULL,
+	TeacherId int FOREIGN KEY REFERENCES Teachers(Id) NOT NULL,
+	StartDate datetime2 NOT NULL,
+	EndDate datetime2 NOT NULL
+)
+
+CREATE TABLE StudentGroupLectureStudents (
+	Id int IDENTITY(1, 1) PRIMARY KEY,
+	StudentGroupLectureId int FOREIGN KEY REFERENCES StudentGroupLectures(Id) NOT NULL,
+	StudentId int FOREIGN KEY REFERENCES Students(Id) NOT NULL,
+	Present bit NOT NULL,
+	UNIQUE (StudentGroupLectureId, StudentId)
 )
 
 CREATE TABLE StudentGroupLectures (
