@@ -187,4 +187,16 @@ WHERE t.Id = 6
 -- ispis svih polaznika koji su bili u određenoj učionici
 
 -- ispis svih polaznika i nastavnika za zadanom jeziku
-   
+SELECT s.Id, s.FirstName, s.LastName, 'student' AS PersonStatus
+FROM StudentGroupMembers m
+JOIN Students s ON m.StudentId = s.Id
+JOIN StudentGroups g ON m.StudentGroupId = g.Id
+JOIN Courses c ON g.CourseId = c.Id
+WHERE c.Id = 1
+UNION
+SELECT DISTINCT t.Id, t.FirstName, t.LastName, 'teacher' AS PersonStatus
+FROM StudentGroupLectures l
+JOIN Teachers t ON l.TeacherId = t.Id
+JOIN StudentGroups g ON l.StudentGroupId = g.Id
+JOIN Courses c ON g.CourseId = c.Id
+WHERE c.Id = 1
