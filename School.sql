@@ -1,4 +1,4 @@
-CREATE DATABASE School
+﻿CREATE DATABASE School
 
 USE School
 
@@ -100,6 +100,7 @@ INSERT INTO StudentGroupMembers (StudentGroupId, StudentId) SELECT 2, id FROM St
 INSERT INTO StudentGroupMembers (StudentGroupId, StudentId) SELECT 3, id FROM Students WHERE Birthday LIKE '199[0-5]%' AND PriorKnowledge = 'B2'
 INSERT INTO StudentGroupMembers (StudentGroupId, StudentId) SELECT 4, id FROM Students WHERE Birthday LIKE '198[5-9]%' AND PriorKnowledge = 'B2'
 
+-- https://www.mockaroo.com/
 insert into StudentGroupLectures (StudentGroupId, TeacherId, StartDate, EndDate) values (4, 1, '2021-02-26 17:00:00', '2021-02-26 20:00:00');
 insert into StudentGroupLectures (StudentGroupId, TeacherId, StartDate, EndDate) values (3, 1, '2021-05-17 17:00:00', '2021-05-17 20:00:00');
 insert into StudentGroupLectures (StudentGroupId, TeacherId, StartDate, EndDate) values (3, 9, '2021-12-10 17:00:00', '2021-12-10 20:00:00');
@@ -125,3 +126,54 @@ INSERT INTO StudentGroupLectureAttendance (StudentGroupLectureId, StudentId, Pre
 SELECT l.Id, m.StudentId, CRYPT_GEN_RANDOM(1) % 2
 FROM StudentGroupLectures l
 RIGHT JOIN StudentGroupMembers m ON l.StudentGroupId = m.StudentGroupId;
+
+-- queries -------------------------------------------------------------
+
+-- raspored održavanja tečajeva u školi za određeni vremenski period.
+SELECT c.Id AS CourseId, g.Id AS GroupId,
+       c.Title, l.StartDate, l.EndDate
+FROM StudentGroupLectures l
+JOIN StudentGroups g ON l.StudentGroupId = g.Id
+JOIN Courses c ON g.CourseId = c.Id
+WHERE l.StartDate BETWEEN '2021-03-01' AND '2021-09-01'
+
+-- raspored održavanja tečaja za pojedinu grupu polaznika za određeni vremenski period. 
+SELECT c.Id AS CourseId, g.Id AS GroupId,
+       c.Title, l.StartDate, l.EndDate
+FROM StudentGroupLectures l
+JOIN StudentGroups g ON l.StudentGroupId = g.Id
+JOIN Courses c ON g.CourseId = c.Id
+WHERE g.Id = 3
+  AND l.StartDate BETWEEN '2021-03-01' AND '2021-09-01'
+
+-- raspored rada pojedinog nastavnika za određeni vremenski period. 
+SELECT c.Id AS CourseId, g.Id AS GroupId, t.Id AS TeacherId,
+       t.FirstName, t.LastName, c.Title, l.StartDate, l.EndDate
+FROM StudentGroupLectures l
+JOIN Teachers t ON l.TeacherId = t.Id
+JOIN StudentGroups g ON l.StudentGroupId = g.Id
+JOIN Courses c ON g.CourseId = c.Id
+WHERE t.Id = 6
+  AND l.StartDate BETWEEN '2021-03-01' AND '2021-09-01'
+
+-- izvještaj za pojedinog polaznika za određeni vremenski period,
+-- koji uključuje podatke o tečajevima stranih jezika koje sluša,
+-- stupnjevima koje je završio, nastavnicima koji mu predaju,
+-- prisutnosti na nastavi te ratama koje je uplatio. 
+
+-- izvještaj o brojnosti polaznika i posjećenosti nastave na pojedinom tečaju u određenom vremenskom periodu. 
+
+-- pregled brojnosti polaznika na pojedinim tečajevima po starosnim skupinama. 
+
+-- ispis imena najstarijeg polaznika koji pohađa više od dva jezika
+
+-- sortiranje tečajeva po broju polaznika koji imaju manje od 20 godina
+
+-- ispis statusa polaznika
+
+-- ispis svih polaznika koji polažu bilo koji od tečajeva za određen jezik
+
+-- ispis svih polaznika koji su bili u određenoj učionici
+
+-- ispis svih polaznika i nastavnika za zadanom jeziku
+   
