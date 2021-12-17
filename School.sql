@@ -185,6 +185,11 @@ WHERE t.Id = 6
 -- ispis svih polaznika koji polažu bilo koji od tečajeva za određen jezik
 
 -- ispis svih polaznika koji su bili u određenoj učionici
+SELECT DISTINCT s.Id, s.FirstName, s.LastName
+FROM StudentGroupLectures l
+RIGHT JOIN StudentGroupMembers m ON l.StudentGroupId = m.StudentGroupId
+JOIN Students s ON m.StudentId = s.Id
+WHERE l.ClassId = 2
 
 -- ispis svih polaznika i nastavnika za zadanom jeziku
 SELECT s.Id, s.FirstName, s.LastName, 'student' AS PersonStatus
