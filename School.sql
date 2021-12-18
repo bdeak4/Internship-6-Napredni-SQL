@@ -73,7 +73,7 @@ insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Au
 insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Waylon', 'Fackney', '1981-03-26', 'A1');
 insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Carson', 'Giannoni', '1984-10-24', 'A3');
 insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Craggy', 'Tulloch', '1984-12-17', 'B2');
-insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Pasquale', 'Wyse', '2002-08-24', 'B2');
+insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Pasquale', 'Wyse', '2004-08-24', 'B2');
 insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Coretta', 'Dabourne', '1992-07-24', 'B2');
 insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Emmye', 'Jeffcock', '1988-04-17', 'B2');
 insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Woody', 'Yurasov', '1985-10-06', 'B2');
@@ -181,8 +181,23 @@ WHERE t.Id = 6
 -- sortiranje tečajeva po broju polaznika koji imaju manje od 20 godina
 
 -- ispis statusa polaznika
+SELECT *, CASE WHEN Age <= 17 THEN 'ucenik'
+               WHEN Age >= 18 AND Age <= 27 THEN 'student'
+               WHEN Age >= 28 AND Age <= 66 THEN 'radnik'
+               ELSE 'penzioner'
+          END AS PersonStatus
+FROM (
+	SELECT *, FLOOR(DATEDIFF(DAY, Birthday, GETDATE()) / 365.25) AS Age
+	FROM Students
+) AS Students
 
 -- ispis svih polaznika koji polažu bilo koji od tečajeva za određen jezik
+SELECT s.Id, s.FirstName, s.LastName
+FROM StudentGroupMembers m
+JOIN Students s ON m.StudentId = s.Id
+JOIN StudentGroups g ON m.StudentGroupId = g.Id
+JOIN Courses c ON g.CourseId = c.Id
+WHERE c.Id = 1
 
 -- ispis svih polaznika koji su bili u određenoj učionici
 SELECT DISTINCT s.Id, s.FirstName, s.LastName
