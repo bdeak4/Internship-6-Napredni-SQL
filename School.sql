@@ -69,7 +69,7 @@ insert into Teachers (FirstName, LastName) values ('Kath', 'Wohler');
 insert into Teachers (FirstName, LastName) values ('Mirabelle', 'Seide');
 insert into Teachers (FirstName, LastName) values ('Beltran', 'Dewdney');
 insert into Teachers (FirstName, LastName) values ('Justen', 'Spelman');
-insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Aurlie', 'Howchin', '1997-05-10', 'A1');
+insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Aurlie', 'Howchin', '2007-05-10', 'B2');
 insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Waylon', 'Fackney', '1981-03-26', 'A1');
 insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Carson', 'Giannoni', '1984-10-24', 'A3');
 insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Craggy', 'Tulloch', '1984-12-17', 'B2');
@@ -83,9 +83,9 @@ insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Jo
 insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Caron', 'Issacoff', '1982-07-15', 'A2');
 insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Aubrey', 'Blizard', '1982-09-23', 'A2');
 insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Pammie', 'Djekovic', '1990-09-10', 'A2');
-insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Willy', 'Bortoletti', '1992-06-13', 'A2');
+insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Willy', 'Bortoletti', '2002-06-13', 'A2');
 insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Rodrick', 'Skip', '1982-03-24', 'A2');
-insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Hubie', 'Webb-Bowen', '1998-09-08', 'B1');
+insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Hubie', 'Webb-Bowen', '2008-09-08', 'B2');
 insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Corty', 'Espinay', '1981-01-14', 'B1');
 insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Far', 'Croci', '1991-06-11', 'B1');
 insert into Students (FirstName, LastName, Birthday, PriorKnowledge) values ('Rudie', 'Harlin', '1984-09-18', 'B1');
@@ -99,7 +99,8 @@ INSERT INTO StudentGroups (CourseId) VALUES
 (1),
 (1),
 (1),
-(5)
+(5),
+(4)
 
 INSERT INTO Classes(Title) VALUES
 ('A100'),
@@ -108,8 +109,9 @@ INSERT INTO Classes(Title) VALUES
 
 INSERT INTO StudentGroupMembers (StudentGroupId, StudentId) SELECT 1, id FROM Students WHERE Birthday LIKE '198[0-4]%' AND PriorKnowledge = 'A2'
 INSERT INTO StudentGroupMembers (StudentGroupId, StudentId) SELECT 2, id FROM Students WHERE Birthday LIKE '198[5-9]%' AND PriorKnowledge = 'B2'
-INSERT INTO StudentGroupMembers (StudentGroupId, StudentId) SELECT 3, id FROM Students WHERE Birthday LIKE '199[0-5]%' AND PriorKnowledge = 'B2'
+INSERT INTO StudentGroupMembers (StudentGroupId, StudentId) SELECT 3, id FROM Students WHERE Birthday LIKE '200[0-5]%' AND PriorKnowledge = 'B2'
 INSERT INTO StudentGroupMembers (StudentGroupId, StudentId) SELECT 4, id FROM Students WHERE Birthday LIKE '198[5-9]%' AND PriorKnowledge = 'B2'
+INSERT INTO StudentGroupMembers (StudentGroupId, StudentId) SELECT 5, id FROM Students WHERE Birthday LIKE '198[5-9]%' AND PriorKnowledge = 'B2'
 
 -- https://www.mockaroo.com/
 insert into StudentGroupLectures (StudentGroupId, TeacherId, ClassId, StartDate, EndDate) values (4, 1, 3, '2021-02-26 17:00:00', '2021-02-26 20:00:00');
@@ -177,8 +179,25 @@ WHERE t.Id = 6
 -- pregled brojnosti polaznika na pojedinim tečajevima po starosnim skupinama. 
 
 -- ispis imena najstarijeg polaznika koji pohađa više od dva jezika
+SELECT TOP 1 s.Id, s.FirstName, s.LastName, s.Birthday, COUNT(m.StudentGroupId) AS StudentGroupCount
+FROM StudentGroupMembers m
+JOIN Students s ON m.StudentId = s.Id
+GROUP BY s.Id, s.FirstName, s.LastName, s.Birthday
+HAVING COUNT(m.StudentGroupId) > 2
+ORDER BY FLOOR(DATEDIFF(DAY, s.Birthday, GETDATE()) / 365.25) DESC
 
 -- sortiranje tečajeva po broju polaznika koji imaju manje od 20 godina
+SELECT g.Id, c.Title, COUNT(s.Id) AS StudentCount
+FROM StudentGroups g
+RIGHT JOIN StudentGroupMembers m ON m.StudentGroupId = g.Id
+LEFT JOIN (
+	SELECT *
+	FROM Students
+	WHERE FLOOR(DATEDIFF(DAY, Birthday, GETDATE()) / 365.25) < 20
+) s ON m.StudentId = s.Id
+JOIN Courses c ON g.CourseId = c.Id
+GROUP BY g.Id, c.Title
+ORDER BY StudentCount DESC
 
 -- ispis statusa polaznika
 SELECT *, CASE WHEN Age <= 17 THEN 'ucenik'
