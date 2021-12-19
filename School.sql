@@ -176,7 +176,20 @@ WHERE t.Id = 6
 
 -- izvještaj o brojnosti polaznika i posjećenosti nastave na pojedinom tečaju u određenom vremenskom periodu. 
 
--- pregled brojnosti polaznika na pojedinim tečajevima po starosnim skupinama. 
+-- pregled brojnosti polaznika na pojedinim tečajevima po starosnim skupinama.
+SELECT StudentGroupId, c.Title,
+       SUM(CASE WHEN Age <= 17 THEN 1 ELSE 0 END) AS 'BrojUcenika',
+       SUM(CASE WHEN Age >= 18 AND Age <= 27 THEN 1 ELSE 0 END) AS 'BrojStudenata',
+       SUM(CASE WHEN Age >= 28 AND Age <= 66 THEN 1 ELSE 0 END) AS 'BrojRadnika',
+       SUM(CASE WHEN Age >= 67 THEN 1 ELSE 0 END) AS 'BrojPenzionera'
+FROM StudentGroupMembers m
+JOIN (
+	SELECT *, FLOOR(DATEDIFF(DAY, Birthday, GETDATE()) / 365.25) AS Age
+	FROM Students
+) s ON m.StudentId = s.Id
+JOIN StudentGroups g ON m.StudentGroupId = g.Id
+JOIN Courses c ON g.CourseId = c.Id
+GROUP BY StudentGroupId, c.Title
 
 -- ispis imena najstarijeg polaznika koji pohađa više od dva jezika
 SELECT TOP 1 s.Id, s.FirstName, s.LastName, s.Birthday, COUNT(m.StudentGroupId) AS StudentGroupCount
