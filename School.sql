@@ -36,7 +36,9 @@ CREATE TABLE Classes (
 CREATE TABLE StudentGroupMembers (
 	Id int IDENTITY(1, 1) PRIMARY KEY,
 	StudentGroupId int FOREIGN KEY REFERENCES StudentGroups(Id) NOT NULL,
-	StudentId int FOREIGN KEY REFERENCES Students(Id) NOT NULL
+	StudentId int FOREIGN KEY REFERENCES Students(Id) NOT NULL,
+	TotalInstallments int NOT NULL,
+	PaidInstallments int NOT NULL
 )
 
 CREATE TABLE StudentGroupLectures (
@@ -107,11 +109,11 @@ INSERT INTO Classes(Title) VALUES
 ('A101'),
 ('C401')
 
-INSERT INTO StudentGroupMembers (StudentGroupId, StudentId) SELECT 1, id FROM Students WHERE Birthday LIKE '198[0-4]%' AND PriorKnowledge = 'A2'
-INSERT INTO StudentGroupMembers (StudentGroupId, StudentId) SELECT 2, id FROM Students WHERE Birthday LIKE '198[5-9]%' AND PriorKnowledge = 'B2'
-INSERT INTO StudentGroupMembers (StudentGroupId, StudentId) SELECT 3, id FROM Students WHERE Birthday LIKE '200[0-5]%' AND PriorKnowledge = 'B2'
-INSERT INTO StudentGroupMembers (StudentGroupId, StudentId) SELECT 4, id FROM Students WHERE Birthday LIKE '198[5-9]%' AND PriorKnowledge = 'B2'
-INSERT INTO StudentGroupMembers (StudentGroupId, StudentId) SELECT 5, id FROM Students WHERE Birthday LIKE '198[5-9]%' AND PriorKnowledge = 'B2'
+INSERT INTO StudentGroupMembers (StudentGroupId, StudentId, TotalInstallments, PaidInstallments) SELECT 1, id, 12, CRYPT_GEN_RANDOM(1) % 12 FROM Students WHERE Birthday LIKE '198[0-4]%' AND PriorKnowledge = 'A2'
+INSERT INTO StudentGroupMembers (StudentGroupId, StudentId, TotalInstallments, PaidInstallments) SELECT 2, id,  6, CRYPT_GEN_RANDOM(1) %  6 FROM Students WHERE Birthday LIKE '198[5-9]%' AND PriorKnowledge = 'B2'
+INSERT INTO StudentGroupMembers (StudentGroupId, StudentId, TotalInstallments, PaidInstallments) SELECT 3, id, 18, CRYPT_GEN_RANDOM(1) % 18 FROM Students WHERE Birthday LIKE '200[0-5]%' AND PriorKnowledge = 'B2'
+INSERT INTO StudentGroupMembers (StudentGroupId, StudentId, TotalInstallments, PaidInstallments) SELECT 4, id, 12, CRYPT_GEN_RANDOM(1) % 12 FROM Students WHERE Birthday LIKE '198[5-9]%' AND PriorKnowledge = 'B2'
+INSERT INTO StudentGroupMembers (StudentGroupId, StudentId, TotalInstallments, PaidInstallments) SELECT 5, id, 12, CRYPT_GEN_RANDOM(1) % 12 FROM Students WHERE Birthday LIKE '198[5-9]%' AND PriorKnowledge = 'B2'
 
 -- https://www.mockaroo.com/
 insert into StudentGroupLectures (StudentGroupId, TeacherId, ClassId, StartDate, EndDate) values (4, 1, 3, '2021-02-26 17:00:00', '2021-02-26 20:00:00');
@@ -138,7 +140,7 @@ insert into StudentGroupLectures (StudentGroupId, TeacherId, ClassId, StartDate,
 INSERT INTO StudentGroupLectureAttendance (StudentGroupLectureId, StudentId, Present)
 SELECT l.Id, m.StudentId, CRYPT_GEN_RANDOM(1) % 2
 FROM StudentGroupLectures l
-RIGHT JOIN StudentGroupMembers m ON l.StudentGroupId = m.StudentGroupId;
+JOIN StudentGroupMembers m ON l.StudentGroupId = m.StudentGroupId
 
 -- queries -------------------------------------------------------------
 
