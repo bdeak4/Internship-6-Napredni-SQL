@@ -175,6 +175,17 @@ WHERE t.Id = 6
 -- prisutnosti na nastavi te ratama koje je uplatio. 
 
 -- izvještaj o brojnosti polaznika i posjećenosti nastave na pojedinom tečaju u određenom vremenskom periodu. 
+SELECT StudentGroupId, MemberCount,
+       AVG(CAST(100.0 * PresentCount / MemberCount AS int)) AS AverageAttendance
+FROM (
+	SELECT l.StudentGroupId, COUNT(*) AS MemberCount,
+	       SUM(CASE WHEN Present = 1 THEN 1 ELSE 0 END) AS PresentCount
+	FROM StudentGroupLectureAttendance a
+	JOIN StudentGroupLectures l ON a.StudentGroupLectureId = l.Id
+	WHERE l.StartDate BETWEEN '2021-03-01' AND '2021-09-01'
+	GROUP BY l.Id, l.StudentGroupId
+) AS g
+GROUP BY StudentGroupId, MemberCount
 
 -- pregled brojnosti polaznika na pojedinim tečajevima po starosnim skupinama.
 SELECT StudentGroupId, c.Title,
