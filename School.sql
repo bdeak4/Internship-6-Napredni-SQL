@@ -177,37 +177,38 @@ WHERE t.Id = 6
 -- prisutnosti na nastavi te ratama koje je uplatio.
 SELECT *,
        (
-			SELECT STRING_AGG(Teacher, ', ')
-			FROM (
-				SELECT DISTINCT t.FirstName + ' ' + t.LastName AS Teacher
-				FROM Teachers t
-				JOIN StudentGroupLectures l ON l.TeacherId = t.Id
-				JOIN StudentGroupMembers m ON m.StudentGroupId = l.StudentGroupId
-				WHERE m.StudentId = s.Id
-				  AND l.StartDate BETWEEN '2021-03-01' AND '2021-10-01'
-			) AS t
+           SELECT STRING_AGG(Teacher, ', ')
+           FROM (
+               SELECT DISTINCT t.FirstName + ' ' + t.LastName AS Teacher
+               FROM Teachers t
+               JOIN StudentGroupLectures l ON l.TeacherId = t.Id
+               JOIN StudentGroupMembers m ON m.StudentGroupId = l.StudentGroupId
+               WHERE m.StudentId = s.Id
+                 AND l.StartDate BETWEEN '2021-03-01' AND '2021-10-01'
+           ) AS t
        ) AS Teachers,
-	   (
-			SELECT STRING_AGG(Title, ', ')
-			FROM (
-				SELECT DISTINCT Title
-				FROM Courses c
-				JOIN StudentGroups g ON g.CourseId = c.Id
-				JOIN StudentGroupLectures l ON l.StudentGroupId = g.Id
-				JOIN StudentGroupMembers m ON m.StudentGroupId = g.Id
-				WHERE m.StudentId = s.Id
-				  AND l.StartDate BETWEEN '2021-03-01' AND '2021-10-01'
-			) AS c
+       (
+           SELECT STRING_AGG(Title, ', ')
+           FROM (
+               SELECT DISTINCT Title
+               FROM Courses c
+               JOIN StudentGroups g ON g.CourseId = c.Id
+               JOIN StudentGroupLectures l ON l.StudentGroupId = g.Id
+               JOIN StudentGroupMembers m ON m.StudentGroupId = g.Id
+               WHERE m.StudentId = s.Id
+                 AND l.StartDate BETWEEN '2021-03-01' AND '2021-10-01'
+           ) AS c
        ) AS Courses,
-	   (
-			SELECT CAST((100.0 * SUM(CASE WHEN Present = 1 THEN 1 ELSE 0 END) / COUNT(*)) AS int)
-			FROM StudentGroupLectureAttendance WHERE StudentId = s.Id
-	   ) AS LectureAttendancePercent,
-	   (
-			SELECT CAST(SUM(PaidInstallments) AS varchar) + '/' + CAST(SUM(TotalInstallments) AS varchar)
-			FROM StudentGroupMembers m
-			WHERE m.StudentId = s.Id
-	   ) AS PaidInstallments
+       (
+           SELECT CAST((100.0 * SUM(CASE WHEN Present = 1 THEN 1 ELSE 0 END) / COUNT(*)) AS int)
+           FROM StudentGroupLectureAttendance
+           WHERE StudentId = s.Id
+       ) AS LectureAttendancePercent,
+       (
+           SELECT CAST(SUM(PaidInstallments) AS varchar) + '/' + CAST(SUM(TotalInstallments) AS varchar)
+           FROM StudentGroupMembers m
+           WHERE m.StudentId = s.Id
+       ) AS PaidInstallments
 FROM Students s
 WHERE s.Id = 7
 
