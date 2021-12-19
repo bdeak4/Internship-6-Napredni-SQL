@@ -174,11 +174,46 @@ WHERE t.Id = 6
 -- izvještaj za pojedinog polaznika za određeni vremenski period,
 -- koji uključuje podatke o tečajevima stranih jezika koje sluša,
 -- stupnjevima koje je završio, nastavnicima koji mu predaju,
--- prisutnosti na nastavi te ratama koje je uplatio. 
+-- prisutnosti na nastavi te ratama koje je uplatio.
+SELECT *,
+       (
+			SELECT STRING_AGG(Teacher, ', ')
+			FROM (
+				SELECT DISTINCT t.FirstName + ' ' + t.LastName AS Teacher
+				FROM Teachers t
+				JOIN StudentGroupLectures l ON l.TeacherId = t.Id
+				JOIN StudentGroupMembers m ON m.StudentGroupId = l.StudentGroupId
+				WHERE m.StudentId = s.Id
+				  AND l.StartDate BETWEEN '2021-03-01' AND '2021-10-01'
+			) AS t
+       ) AS Teachers,
+	   (
+			SELECT STRING_AGG(Title, ', ')
+			FROM (
+				SELECT DISTINCT Title
+				FROM Courses c
+				JOIN StudentGroups g ON g.CourseId = c.Id
+				JOIN StudentGroupLectures l ON l.StudentGroupId = g.Id
+				JOIN StudentGroupMembers m ON m.StudentGroupId = g.Id
+				WHERE m.StudentId = s.Id
+				  AND l.StartDate BETWEEN '2021-03-01' AND '2021-10-01'
+			) AS c
+       ) AS Courses,
+	   (
+			SELECT CAST((100.0 * SUM(CASE WHEN Present = 1 THEN 1 ELSE 0 END) / COUNT(*)) AS int)
+			FROM StudentGroupLectureAttendance WHERE StudentId = s.Id
+	   ) AS LectureAttendancePercent,
+	   (
+			SELECT CAST(SUM(PaidInstallments) AS varchar) + '/' + CAST(SUM(TotalInstallments) AS varchar)
+			FROM StudentGroupMembers m
+			WHERE m.StudentId = s.Id
+	   ) AS PaidInstallments
+FROM Students s
+WHERE s.Id = 7
 
 -- izvještaj o brojnosti polaznika i posjećenosti nastave na pojedinom tečaju u određenom vremenskom periodu. 
 SELECT StudentGroupId, MemberCount,
-       AVG(CAST(100.0 * PresentCount / MemberCount AS int)) AS AverageAttendance
+       AVG(CAST(100.0 * PresentCount / MemberCount AS int)) AS AverageAttendancePercent
 FROM (
 	SELECT l.StudentGroupId, COUNT(*) AS MemberCount,
 	       SUM(CASE WHEN Present = 1 THEN 1 ELSE 0 END) AS PresentCount
